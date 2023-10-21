@@ -1,3 +1,9 @@
+use proconio::input;
+
 fn main() {
-    println!("Hello, world!");
+    input! {
+        s:String,
+        t:String,
+    }
+    println!("{} san", s);
 }
