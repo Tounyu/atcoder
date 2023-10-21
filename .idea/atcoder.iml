@@ -12,6 +12,7 @@
       <excludeFolder url="file://$MODULE_DIR$/abc324/C/target" />
       <excludeFolder url="file://$MODULE_DIR$/abc324/D/target" />
       <excludeFolder url="file://$MODULE_DIR$/abc324/E/target" />
+      <excludeFolder url="file://$MODULE_DIR$/abc325/A/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
