@@ -1,7 +1,9 @@
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use proconio::input;
-
+/*
+優先度付きキュー
+*/
 fn main() {
     input! {
         N:usize,
