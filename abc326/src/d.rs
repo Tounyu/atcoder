@@ -1,72 +1,108 @@
-use std::collections::VecDeque;
+use itertools::Itertools;
 use proconio::input;
 use proconio::marker::Chars;
 
 fn main() {
     input! {
         n:usize,
-        row:String,
-        col:String,
+        row:Chars,
+        col:Chars,
     }
 
-    let ans = check(n,  &row, &col).unwrap();
+    let mut rows = vec![];
 
-    for row in ans {
-        println!("{}", row);
+    let mut chars = vec!['A','B','C'];
+    for _i in 0..n-3{
+        chars.push('.');
+    }
+    for r in chars.into_iter().permutations(n) {
+        rows.push(r);
+    }
+
+    let mut index = vec![0usize; n];
+    if let Some(v) = dfs(&rows, 0, &row, &col, &mut index) {
+        println!("Yes");
+        for row in v {
+            println!("{}", row.iter().join(""));
+        }
+    } else {
+        println!("No");
     }
 }
-fn check(n: usize, r: &str, c: &str) -> Option<Vec<String>> {
-    let mut grid: Vec<Vec<char>> = vec![vec!['.'; n]; n];
-    let mut counts = [0, 0, 0];
 
-    // 列の制約を満たすようにマス目を埋める
-    for i in 0..n {
-        let ch = r.chars().nth(i).unwrap();
-        let idx = match ch {
-            'A' => 0,
-            'B' => 1,
-            'C' => 2,
-            _ => unreachable!(),
-        };
-        grid[i][i] = ch;
-        counts[idx] += 1;
+fn dfs(rows:&Vec<Vec<char>>, now:usize, row:&Vec<char>, col:&Vec<char>, index:&mut Vec<usize>) -> Option<Vec<Vec<char>>> {
+    let mut v = vec![vec![]; now];
+    for i in 0..now {
+        for &c in &rows[index[i]] {
+            v[i].push(c);
+        }
     }
 
-    // 行の制約を満たすようにマス目を埋める
-    for i in 0..n {
-        let ch = c.chars().nth(i).unwrap();
-        let idx = match ch {
-            'A' => 0,
-            'B' => 1,
-            'C' => 2,
-            _ => unreachable!(),
-        };
-        // すでに埋まっている場合はスキップ
-        if grid[i][i] == ch {
-            continue;
+    if now > 0 {
+
+        let n = row.len();
+        if now == n {
+            let mut check = vec!['A','B','C'];
+            for _i in 0..n-3{
+                check.push('.');
+            }
+            check.sort();
+            for x in 0..n {
+                let mut cy = vec![];
+                for y in 0..n {
+                    cy.push(v[y][x]);
+                }
+                cy.sort();
+                if cy != check {
+                    return None;
+                }
+            }
         }
-        // 列で同じ文字が使用されていなければ、その文字を使って埋める
-        if counts[idx] == 0 {
-            grid[i][i] = ch;
-            counts[idx] += 1;
-        } else {
-            // それ以外の場合は、残りの文字を使って埋める
-            for j in 0..n {
-                if grid[j][i] == '.' {
-                    grid[j][i] = ch;
+
+        let mut cx = vec![];
+        let mut cy = vec![];
+        for x in 0..now {
+            for y in 0..now {
+                if v[y][x] != '.' {
+                    cx.push(v[y][x]);
                     break;
                 }
             }
         }
+
+        if cx != col[..now] {
+            return None;
+        }
+        for y in 0..now {
+            for x in 0..now {
+                if v[y][x] != '.' {
+                    cy.push(v[y][x]);
+                    break;
+                }
+            }
+        }
+        if cy != row[..now] {
+            return None;
+        }
+
+        if now == n {
+            return Some(v);
+        }
     }
 
-    // 制約を満たす書き込み方が存在するか確認
-    if counts.iter().all(|&x| x == 1) {
-        // 書き込み方が存在する場合、文字列に変換して返す
-        let result: Vec<String> = grid.into_iter().map(|row| row.into_iter().collect()).collect();
-        Some(result)
-    } else {
-        // 書き込み方が存在しない場合、Noneを返す
-        None
+    for i in 0..rows.len() {
+        index[now] = i;
+        // println!("{:?}",index);
+        if let Some(v) = dfs(
+            rows,
+            now + 1,
+            row,
+            col,
+            index
+        ) {
+            return Some(v);
+        }
     }
+
+    return None;
 }
