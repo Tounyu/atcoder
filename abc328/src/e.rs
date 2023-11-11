@@ -3,6 +3,7 @@ use itertools::Itertools;
 use proconio::input;
 use proconio::marker::Usize1;
 
+// 全域木 Union-Find
 fn main() {
     input! {
         n:usize,

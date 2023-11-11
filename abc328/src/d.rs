@@ -1,6 +1,7 @@
 use proconio::input;
 use proconio::marker::Chars;
 
+// Deque
 fn main() {
     input! {
        s:Chars,

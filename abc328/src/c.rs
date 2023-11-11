@@ -1,6 +1,7 @@
 use proconio::input;
 use proconio::marker::Chars;
 
+// 累積和
 fn main() {
     input! {
         n:usize,
