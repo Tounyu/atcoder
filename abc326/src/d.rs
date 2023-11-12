@@ -18,91 +18,73 @@ fn main() {
     for r in chars.into_iter().permutations(n) {
         rows.push(r);
     }
+    rows.dedup();
 
-    let mut index = vec![0usize; n];
-    if let Some(v) = dfs(&rows, 0, &row, &col, &mut index) {
+    let mut ans = vec![];
+    if dfs(n, &row, &col, &rows, 0, &mut ans) {
         println!("Yes");
-        for row in v {
-            println!("{}", row.iter().join(""));
+        for i in 0..n {
+            let s = ans[i].iter().join("");
+            println!("{}",s);
         }
     } else {
         println!("No");
     }
 }
 
-fn dfs(rows:&Vec<Vec<char>>, now:usize, row:&Vec<char>, col:&Vec<char>, index:&mut Vec<usize>) -> Option<Vec<Vec<char>>> {
-    let mut v = vec![vec![]; now];
-    for i in 0..now {
-        for &c in &rows[index[i]] {
-            v[i].push(c);
+
+fn dfs(
+    n: usize,
+    row: &Vec<char>,
+    col: &Vec<char>,
+    rows: &Vec<Vec<char>>,
+    now: usize,
+    ans: &mut Vec<Vec<char>>,
+) -> bool {
+    if now == n {
+        // rowはABCが必ず1つずつを満たすので、colをチェックする
+        for j in 0..n {
+            let mut count = vec![0; 3];
+            for i in 0..n {
+                if ans[i][j] == '.' {
+                    continue;
+                }
+                count[(ans[i][j] as u8 - b'A') as usize] += 1;
+            }
+
+            if !count.iter().all(| &cnt| cnt == 1) {
+                return false;
+            }
         }
+        return true;
     }
 
-    if now > 0 {
-
-        let n = row.len();
-        if now == n {
-            let mut check = vec!['A','B','C'];
-            for _i in 0..n-3{
-                check.push('.');
-            }
-            check.sort();
-            for x in 0..n {
-                let mut cy = vec![];
-                for y in 0..n {
-                    cy.push(v[y][x]);
-                }
-                cy.sort();
-                if cy != check {
-                    return None;
-                }
-            }
+    for r in rows.iter() {
+        if *r.iter().find(|c| **c != '.').unwrap() != row[now] {
+            continue;
         }
+        ans.push(r.clone());
+        let mut ok = true;
+        for j in 0..n {
+            for i in 0..=now {
+                if ans[i][j] == '.' {
+                    continue;
+                }
 
-        let mut cx = vec![];
-        let mut cy = vec![];
-        for x in 0..now {
-            for y in 0..now {
-                if v[y][x] != '.' {
-                    cx.push(v[y][x]);
+                if ans[i][j] == col[j] {
                     break;
+                } else {
+                    ok = false;
                 }
             }
         }
 
-        if cx != col[..now] {
-            return None;
-        }
-        for y in 0..now {
-            for x in 0..now {
-                if v[y][x] != '.' {
-                    cy.push(v[y][x]);
-                    break;
-                }
-            }
-        }
-        if cy != row[..now] {
-            return None;
+        if ok && dfs(n, row, col, rows, now + 1, ans) {
+            return true;
         }
 
-        if now == n {
-            return Some(v);
-        }
+        ans.pop();
     }
 
-    for i in 0..rows.len() {
-        index[now] = i;
-        // println!("{:?}",index);
-        if let Some(v) = dfs(
-            rows,
-            now + 1,
-            row,
-            col,
-            index
-        ) {
-            return Some(v);
-        }
-    }
-
-    return None;
+    false
 }
