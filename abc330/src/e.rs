@@ -8,5 +8,5 @@ fn main() {
         a:[usize;n],
         q:[(usize,usize);Q],
     }
-    
+
 }
