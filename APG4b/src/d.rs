@@ -6,7 +6,5 @@ fn main() {
         A:usize,
         B:usize,
     }
-
-    let ff = 2 * A + 100 - B;
-    println!("{}", ff);
+    println!("{}", A+B);
 }
