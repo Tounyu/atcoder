@@ -7,6 +7,10 @@ fn main() {
         B:usize,
     }
 
-    let ff = 2 * A + 100 - B;
-    println!("{}", ff);
+    for i in 0..10 {
+        if i != A + B {
+            println!("{i}");
+            return;
+        }
+    }
 }
